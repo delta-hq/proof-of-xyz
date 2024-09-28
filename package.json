@@ -1,0 +1,12 @@
+{
+  "version": "4.0.0",
+  "description": "Proof of Coinbase USDC using ZK Email",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "yarn@3.2.3"
+}

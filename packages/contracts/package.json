@@ -1,0 +1,15 @@
+{
+  "name": "@proof-of-usdc/contracts",
+  "version": "4.0.0",
+  "scripts": {
+    "build": "forge compile",
+    "test": "forge test"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "@zk-email/contracts": "^6.1.3"
+  },
+  "devDependencies": {
+    "forge-std": "git+https://github.com/foundry-rs/forge-std.git"
+  }
+}

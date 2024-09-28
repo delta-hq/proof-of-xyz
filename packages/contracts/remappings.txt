@@ -1,0 +1,3 @@
+@openzeppelin/contracts=./../../node_modules/@openzeppelin/contracts
+forge-std=./../../node_modules/forge-std/src
+@zk-email/contracts=./../../node_modules/@zk-email/contracts
