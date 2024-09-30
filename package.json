@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "description": "Proof of Coinbase USDC using ZK Email",
+  "description": "Proof of XYZ using ZK Email",
   "private": true,
   "workspaces": [
     "packages/*"

@@ -1,8 +1,6 @@
-# Proof of USDC
+# Proof of XYZ
 
-You can use an email from Coinbase that contains `Congrats! You received USDC rewards` to generate a ZK proof that you hold USDC on Coinbase.
-
-This ZK proof can be used to mint an NFT corresponding to your reward amount in the `ProofOfUSDC` contract.
+Template for ZM Email
 
 ## Running locally
 
