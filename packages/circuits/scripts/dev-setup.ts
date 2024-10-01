@@ -14,6 +14,21 @@ import https from "https";
 import fs from "fs";
 import path from "path";
 import pako from "pako";
+import { program } from 'commander';
+
+// Define the CLI options and arguments using commander
+program
+  .option('-c, --circuit-name <name>', 'Specify the CircuitName')  // Add an option for CircuitName
+  .parse(process.argv);  // Parse the command-line arguments
+
+// Get the CircuitName from the options
+const options = program.opts();
+const CIRCUIT_NAME = options.circuitName;
+
+if (!CIRCUIT_NAME) {
+  console.error("Error: Please provide a CircuitName using --circuit-name or -c.");
+  process.exit(1);
+}
 
 // ENV Variables
 let { ZKEY_ENTROPY, ZKEY_BEACON, SILENT } = process.env;
@@ -28,7 +43,6 @@ if (ZKEY_BEACON == null) {
 }
 
 // Constants
-const CIRCUIT_NAME = "coinbase";
 const BUILD_DIR = path.join(__dirname, "../build");
 const PHASE1_URL =
   "https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_22.ptau";
@@ -40,7 +54,7 @@ const SOLIDITY_TEMPLATE = path.join(
 );
 const SOLIDITY_VERIFIER_PATH = path.join(
   __dirname,
-  "../../contracts/src/Verifier.sol"
+  "../../contracts/src/${CIRCUIT_NAME}Verifier.sol"
 );
 
 function log(...message: any) {

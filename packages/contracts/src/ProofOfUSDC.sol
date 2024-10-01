@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
 import "@zk-email/contracts/utils/StringUtils.sol";
 import "./utils/NFTSVG.sol";
-import { Verifier } from "./Verifier.sol";
+import { CoinbaseVerifier } from "./CoinbaseVerifier.sol";
 
 contract ProofOfUSDC is ERC721Enumerable {
     using StringUtils for *;
@@ -26,14 +26,14 @@ contract ProofOfUSDC is ERC721Enumerable {
 
     uint256 private tokenCounter;
     DKIMRegistry dkimRegistry;
-    Verifier public immutable verifier;
+    CoinbaseVerifier public immutable verifier;
 
     mapping(uint256 => string) public tokenIDToRewardAmount;
     mapping(uint256 => string) public tokenIDToTimestamp;
     // is it fine to use string as key?
     mapping(string => bool) public hasMinted;
 
-    constructor(Verifier v, DKIMRegistry d) ERC721("VerifiedEmail", "VerifiedEmail") {
+    constructor(CoinbaseVerifier v, DKIMRegistry d) ERC721("VerifiedEmail", "VerifiedEmail") {
         verifier = v;
         dkimRegistry = d;
     }

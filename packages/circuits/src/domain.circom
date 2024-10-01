@@ -34,10 +34,11 @@ template DomainVerifier(maxHeadersLength, maxBodyLength, n, k) {
     signal input address; // we don't need to constrain the + 1 due to https://geometry.xyz/notebook/groth16-malleability
 
     signal output pubkeyHash;
-    signal output domain;
-
+    
     // TODO: implement this
     signal output toAddrHash;
+
+    signal output domain;
 
     component EV = EmailVerifier(maxHeadersLength, maxBodyLength, n, k, 1);
     EV.emailHeader <== emailHeader;

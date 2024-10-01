@@ -128,7 +128,7 @@ To fix, update the `publicSignals` and `proof` in `test/TestCoinbase.t.sol` with
     - `yarn test`
 3. Generate a proving key and verification key. 
     - CWD: `packages/circuits/scripts`
-    - `ZKEY_ENTROPY=<random-number> ZKEY_BEACON=<random-hex> yarn ts-node dev-setup.ts`
+    - `ZKEY_ENTROPY=<random-number> ZKEY_BEACON=<random-hex> yarn ts-node dev-setup.ts --circuit-name <circuit-name>`
 4. Upload build files to AWS S3
     - CWD: `packages/circuits/scripts`
     - `python3 upload_to_s3.py`  
