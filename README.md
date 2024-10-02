@@ -134,7 +134,7 @@ To fix, update the `publicSignals` and `proof` in `test/TestCoinbase.t.sol` with
     - `python3 upload_to_s3.py`  
 5. Generate a proof on AWS
     - CWD: `packages/circuits/scripts`
-    - `yarn ts-node generate-proof.ts --email-file ../tests/emls/coinbase-test.eml --ethereum-address <your-eth-address>`
+    - `yarn ts-node generate-proof.ts --circuit-name <circuit-name> --email-file <email-path> --ethereum-address <your-eth-address>`
 6. Update inputs + proof, and run test cases on contract
     - CWD: `packages/contracts`
     - `yarn test`

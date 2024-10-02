@@ -5,7 +5,7 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
 import "../src/ProofOfUSDC.sol";
-import "../src/Verifier.sol";
+import "../src/CoinbaseVerifier.sol";
 
 contract Deploy is Script, Test {
     function getPrivateKey() internal returns (uint256) {
@@ -22,7 +22,7 @@ contract Deploy is Script, Test {
         address owner = vm.createWallet(sk).addr;
         vm.startBroadcast(sk);
 
-        Verifier proofVerifier = new Verifier();
+        CoinbaseVerifier proofVerifier = new CoinbaseVerifier();
         console.log("Deployed Verifier at address: %s", address(proofVerifier));
 
         DKIMRegistry dkimRegistry = new DKIMRegistry(owner);

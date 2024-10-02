@@ -4,14 +4,14 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
 import "../src/ProofOfUSDC.sol";
-import "../src/Verifier.sol";
+import "../src/CoinbaseVerifier.sol";
 
 contract CoinbaseUtilsTest is Test {
     using StringUtils for *;
 
     address constant VM_ADDR = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D; // Hardcoded address of the VM from foundry
 
-    Verifier proofVerifier;
+    CoinbaseVerifier proofVerifier;
     DKIMRegistry dkimRegistry;
     ProofOfUSDC testVerifier;
 
@@ -23,7 +23,7 @@ contract CoinbaseUtilsTest is Test {
 
         vm.startPrank(owner);
 
-        proofVerifier = new Verifier();
+        proofVerifier = new CoinbaseVerifier();
         dkimRegistry = new DKIMRegistry(owner);
 
         // These are the Poseidon hash of DKIM public keys for info.coinbase.com

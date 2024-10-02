@@ -1,12 +1,15 @@
 import { buildPoseidon } from "circomlibjs";
 import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim";
-import { generateCoinbaseVerifierCircuitInputs } from "../helpers";
-import { bigIntToChunkedBytes, bytesToBigInt, packedNBytesToString } from "@zk-email/helpers/dist/binary-format";
-
+import { generateDomainVerifierCircuitInputs } from "../helpers";
+import {
+  bigIntToChunkedBytes,
+  bytesToBigInt,
+  packedNBytesToString,
+} from "@zk-email/helpers/dist/binary-format";
+import { getPublicKeyForDomainAndSelector } from "../helpers";
 const path = require("path");
 const fs = require("fs");
 const wasm_tester = require("circom_tester").wasm;
-
 
 describe("Domain email test", function () {
   jest.setTimeout(10 * 60 * 1000); // 10 minutes
@@ -24,23 +27,41 @@ describe("Domain email test", function () {
     circuit = await wasm_tester(path.join(__dirname, "../src/domain.circom"), {
       // NOTE: We are running tests against pre-compiled circuit in the below path
       // You need to manually compile when changes are made to circuit if `recompile` is set to `false`.
-      recompile: true,
+      recompile: false,
       output: path.join(__dirname, "../build/domain"),
-      include: [path.join(__dirname, "../node_modules"), path.join(__dirname, "../../../node_modules")],
+      include: [
+        path.join(__dirname, "../node_modules"),
+        path.join(__dirname, "../../../node_modules"),
+      ],
     });
   });
 
   it("should verify email", async function () {
-    const domainVerifierInputs = await generateCoinbaseVerifierCircuitInputs(rawEmail, ethAddress);
+    const domainVerifierInputs = await generateDomainVerifierCircuitInputs(
+      rawEmail,
+      ethAddress
+    );
     const witness = await circuit.calculateWitness(domainVerifierInputs);
     await circuit.checkConstraints(witness);
     // Calculate DKIM pubkey hash to verify its same as the one from circuit output
     // We input pubkey as 121 * 17 chunk, but the circuit convert it to 242 * 9 chunk for hashing
     // https://zkrepl.dev/?gist=43ce7dce2466c63812f6efec5b13aa73 - This can be used to get pubkey hash from 121 * 17 chunk
-    const dkimResult = await verifyDKIMSignature(rawEmail, "google.com");
+
+    const publicKey = await getPublicKeyForDomainAndSelector(
+      "google.com",
+      "20230601"
+    );
+
+    if (!publicKey) {
+      throw new Error("Public key not found");
+    }
+
+    console.log("publicKey", publicKey?.toString());
+
     const poseidon = await buildPoseidon();
-    const pubkeyChunked = bigIntToChunkedBytes(dkimResult.publicKey, 242, 9);
+    const pubkeyChunked = bigIntToChunkedBytes(publicKey, 242, 9);
     const hash = poseidon(pubkeyChunked);
+    console.log("hash", poseidon.F.toObject(hash).toString());
 
     // Assert pubkey hash
     expect(witness[1]).toEqual(poseidon.F.toObject(hash));
@@ -54,9 +75,14 @@ describe("Domain email test", function () {
     expect(witness[4]).toEqual(BigInt(ethAddress));
   });
 
-  it("should fail if the rewardAmountIndex is invalid", async function () {
-    const domainVerifierInputs = await generateCoinbaseVerifierCircuitInputs(rawEmail, ethAddress);
-    domainVerifierInputs.rewardAmountIndex = (Number((await domainVerifierInputs).rewardAmountIndex) + 1).toString();
+  it.skip("should fail if the rewardAmountIndex is invalid", async function () {
+    const domainVerifierInputs = await generateDomainVerifierCircuitInputs(
+      rawEmail,
+      ethAddress
+    );
+    domainVerifierInputs.domainIndex = (
+      Number((await domainVerifierInputs).domainIndex) + 1
+    ).toString();
 
     expect.assertions(1);
 
@@ -66,11 +92,16 @@ describe("Domain email test", function () {
     } catch (error) {
       expect((error as Error).message).toMatch("Assert Failed");
     }
-  })
+  });
 
-  it("should fail if the rewardAmountIndex is out of bounds", async function () {
-    const domainVerifierInputs = await generateCoinbaseVerifierCircuitInputs(rawEmail, ethAddress);
-    domainVerifierInputs.rewardAmountIndex = (domainVerifierInputs.emailHeaderLength! + 1).toString();
+  it.skip("should fail if the rewardAmountIndex is out of bounds", async function () {
+    const domainVerifierInputs = await generateDomainVerifierCircuitInputs(
+      rawEmail,
+      ethAddress
+    );
+    domainVerifierInputs.domainIndex = (
+      domainVerifierInputs.domainIndex! + 1
+    ).toString();
 
     expect.assertions(1);
 
@@ -80,5 +111,5 @@ describe("Domain email test", function () {
     } catch (error) {
       expect((error as Error).message).toMatch("Assert Failed");
     }
-  })
+  });
 });

@@ -14,21 +14,16 @@ import https from "https";
 import fs from "fs";
 import path from "path";
 import pako from "pako";
-import { program } from 'commander';
+import { program } from "commander";
 
 // Define the CLI options and arguments using commander
 program
-  .option('-c, --circuit-name <name>', 'Specify the CircuitName')  // Add an option for CircuitName
-  .parse(process.argv);  // Parse the command-line arguments
+  .requiredOption("-c, --circuit-name <name>", "Specify the CircuitName") // Add an option for CircuitName
+  .parse(process.argv); // Parse the command-line arguments
 
 // Get the CircuitName from the options
 const options = program.opts();
 const CIRCUIT_NAME = options.circuitName;
-
-if (!CIRCUIT_NAME) {
-  console.error("Error: Please provide a CircuitName using --circuit-name or -c.");
-  process.exit(1);
-}
 
 // ENV Variables
 let { ZKEY_ENTROPY, ZKEY_BEACON, SILENT } = process.env;
@@ -47,14 +42,14 @@ const BUILD_DIR = path.join(__dirname, "../build");
 const PHASE1_URL =
   "https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_22.ptau";
 const PHASE1_PATH = path.join(BUILD_DIR, "powersOfTau28_hez_final_22.ptau");
-const ARTIFACTS_DIR = path.join(BUILD_DIR, 'artifacts');
+const ARTIFACTS_DIR = path.join(BUILD_DIR, "artifacts");
 const SOLIDITY_TEMPLATE = path.join(
   require.resolve("snarkjs"),
   "../../templates/verifier_groth16.sol.ejs"
 );
 const SOLIDITY_VERIFIER_PATH = path.join(
   __dirname,
-  "../../contracts/src/${CIRCUIT_NAME}Verifier.sol"
+  `../../contracts/src/${CIRCUIT_NAME}Verifier.sol`
 );
 
 function log(...message: any) {
@@ -148,7 +143,7 @@ async function exec() {
   }
 
   // Create artifacts directory and copy build files
-  fs.mkdirSync(path.join(BUILD_DIR, 'artifacts'), { recursive: true });
+  fs.mkdirSync(path.join(BUILD_DIR, "artifacts"), { recursive: true });
 
   fs.copyFileSync(
     path.join(BUILD_DIR, `${CIRCUIT_NAME}.r1cs`),
@@ -158,7 +153,7 @@ async function exec() {
     path.join(BUILD_DIR, `${CIRCUIT_NAME}_js/${CIRCUIT_NAME}.wasm`),
     path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.wasm`)
   );
-  
+
   const zKeyPath = path.join(BUILD_DIR, `${CIRCUIT_NAME}.zkey`);
 
   await generateKeys(
@@ -173,7 +168,7 @@ async function exec() {
   // Compress zkeys and copy to artifacts directory
   ["", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"].forEach((suffix) => {
     fs.writeFileSync(
-      path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.zkey`) + suffix + '.gz',
+      path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.zkey`) + suffix + ".gz",
       pako.gzip(fs.readFileSync(zKeyPath + suffix))
     );
   });

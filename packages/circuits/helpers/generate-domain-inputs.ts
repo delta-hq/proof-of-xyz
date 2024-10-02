@@ -1,15 +1,15 @@
 import { bytesToBigInt, fromHex } from "@zk-email/helpers/dist/binary-format";
 import { generateEmailVerifierInputs } from "@zk-email/helpers/dist/input-generators";
 
-export const TO_PRESELECTOR = "To: ";
+export const TO_PRESELECTOR = "to:";
 
 export type IDomainCircuitInputs = {
   emailHeader: string[];
   emailHeaderLength: string;
   pubkey: string[];
   signature: string[];
-  toAddrIndex: string | undefined;
-  domainIndex: string | undefined;
+  toAddrIndex?: string;
+  domainIndex?: string;
   address: string;
   emailBody?: string[] | undefined;
   emailBodyLength?: string | undefined;
@@ -25,32 +25,33 @@ export async function generateDomainVerifierCircuitInputs(
     ignoreBodyHashCheck: true,
   });
 
-const headerRemaining = emailVerifierInputs.emailHeader!.map((c) => Number(c)); // Char array to Uint8Array
+  const headerRemaining = emailVerifierInputs.emailHeader!.map((c) =>
+    Number(c)
+  ); // Char array to Uint8Array
 
- // Convert the preselector to a buffer for use in finding indices
-const toBuffer = Buffer.from(TO_PRESELECTOR);
-const toIndex = Buffer.from(headerRemaining).indexOf(toBuffer);
+  console.log("Full email header:", Buffer.from(headerRemaining).toString());
 
-let domainIndex: string | undefined;
-let toAddrIndex: string | undefined; 
+  // Convert the preselector to a buffer for use in finding indices
+  const toBuffer = Buffer.from(TO_PRESELECTOR);
+  const toIndex = Buffer.from(headerRemaining).indexOf(toBuffer);
 
-if (toIndex !== -1) {
+  let domainIndex;
+
   const emailStartIndex = toIndex + toBuffer.length; // Start after 'To:'
   const emailBuffer = Buffer.from(headerRemaining.slice(emailStartIndex)); // Remaining buffer after 'To:'
 
   // Regex match to extract the email domain
-  const emailMatch = emailBuffer.toString().match(/[A-Za-z0-9!#$%&'*+=?\\-\\^_`{|}~./]+@([A-Za-z0-9.\\-]+)/);
+  const emailMatch = emailBuffer
+    .toString()
+    .match(/[A-Za-z0-9!#$%&'*+=?\\-\\^_`{|}~./]+@([A-Za-z0-9.\\-]+)/);
 
-  if (emailMatch && emailMatch[1]) {
-    const domain = emailMatch[1];
-    domainIndex = emailBuffer.indexOf(domain).toString(); // Assign the index of the domain in the buffer to domainIndex
-    toAddrIndex = (toIndex + toBuffer.length).toString(); // Convert toAddrIndex to string for consistency
-  } else {
-    console.error("Domain not found");
+  if (!emailMatch) {
+    throw new Error("Invalid email format");
   }
-} else {
-  console.error("'To:' field not found in the header");
-}
+
+  const domain = emailMatch[1];
+  domainIndex = (emailBuffer.indexOf(domain) + toBuffer.length).toString(); // Assign the index of the domain in the buffer to domainIndex
+  const toAddrIndex = (toIndex + toBuffer.length).toString(); // Convert toAddrIndex to string for consistency
 
   const address = bytesToBigInt(fromHex(ethereumAddress)).toString();
 

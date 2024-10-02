@@ -1,21 +1,22 @@
 import { program } from "commander";
 import fs from "fs";
 import path from "path";
-import { generateCoinbaseVerifierCircuitInputs } from "../helpers";
+import { generateDomainVerifierCircuitInputs } from "../helpers";
 const snarkjs = require("snarkjs");
 
 program
+  .requiredOption("-c, --circuit-name <name>", "Specify the CircuitName") // Add an option for CircuitName
   .requiredOption("--email-file <string>", "Path to email file")
   .requiredOption(
     "--ethereum-address <string>",
-    "Ethereum address to verify coinbase reward against"
+    "Ethereum address to verify against"
   )
   .option("--silent", "No console logs");
 
 program.parse();
 const args = program.opts();
 
-const CIRCUIT_NAME = "coinbase";
+const CIRCUIT_NAME = args.circuitName;
 const BUILD_DIR = path.join(__dirname, "../build");
 const OUTPUT_DIR = path.join(__dirname, "../proofs");
 
@@ -38,7 +39,10 @@ async function generate() {
   log("Generating input and proof for:", args.emailFile);
 
   const rawEmail = Buffer.from(fs.readFileSync(args.emailFile, "utf8"));
-  const circuitInputs = await generateCoinbaseVerifierCircuitInputs(rawEmail, args.ethereumAddress);
+  const circuitInputs = await generateDomainVerifierCircuitInputs(
+    rawEmail,
+    args.ethereumAddress
+  );
 
   log("\n\nGenerated Inputs:", circuitInputs, "\n\n");
 
@@ -79,7 +83,11 @@ async function generate() {
   );
   log("Public Inputs written to", path.join(OUTPUT_DIR, "public.json"));
 
-  const vkey = JSON.parse(fs.readFileSync(path.join(BUILD_DIR, `/artifacts/coinbase.vkey.json`)).toString());
+  const vkey = JSON.parse(
+    fs
+      .readFileSync(path.join(BUILD_DIR, `/artifacts/domain.vkey.json`))
+      .toString()
+  );
   const proofVerified = await snarkjs.groth16.verify(
     vkey,
     publicSignals,

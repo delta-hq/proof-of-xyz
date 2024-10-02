@@ -26,18 +26,26 @@ export async function generateCoinbaseVerifierCircuitInputs(
     ignoreBodyHashCheck: true,
   });
 
-  const headerRemaining = emailVerifierInputs.emailHeader!.map((c) => Number(c)); // Char array to Uint8Array
-  
-  const rewardAmountBuffer = Buffer.from(REWARD_AMOUNT_PRESELECTOR);
-  const rewardAmountIndex =
-    (Buffer.from(headerRemaining).indexOf(rewardAmountBuffer) + rewardAmountBuffer.length).toString();
+  const headerRemaining = emailVerifierInputs.emailHeader!.map((c) =>
+    Number(c)
+  ); // Char array to Uint8Array
 
+  const rewardAmountBuffer = Buffer.from(REWARD_AMOUNT_PRESELECTOR);
+  const rewardAmountIndex = (
+    Buffer.from(headerRemaining).indexOf(rewardAmountBuffer) +
+    rewardAmountBuffer.length
+  ).toString();
 
   const timestampBuffer = Buffer.from(TIMESTAMP_PRESELECTOR);
-  const timestampIndex =
-    (Buffer.from(headerRemaining).indexOf(timestampBuffer) + timestampBuffer.length).toString();
+  const timestampIndex = (
+    Buffer.from(headerRemaining).indexOf(timestampBuffer) +
+    timestampBuffer.length
+  ).toString();
 
   const address = bytesToBigInt(fromHex(ethereumAddress)).toString();
+
+  console.log("rewardAmountIndex", rewardAmountIndex);
+  console.log("timestampIndex", timestampIndex);
 
   return {
     ...emailVerifierInputs,

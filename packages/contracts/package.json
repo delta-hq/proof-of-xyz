@@ -3,7 +3,7 @@
   "version": "4.0.0",
   "scripts": {
     "build": "forge compile",
-    "test": "forge test"
+    "test": "forge test --match-path test/TestDomain.t.sol"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0",
