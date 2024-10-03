@@ -56,9 +56,6 @@ describe("Domain email test", function () {
     const pubkeyChunked = bigIntToChunkedBytes(dkimResult.publicKey, 242, 9);
 
     const hash = poseidon(pubkeyChunked);
-    console.log("hash", hash.toString());
-
-    process.exit(0);
 
     // Assert pubkey hash
     expect(witness[1]).toEqual(poseidon.F.toObject(hash));
