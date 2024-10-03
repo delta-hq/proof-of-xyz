@@ -41,27 +41,21 @@ describe("Domain email test", function () {
       rawEmail,
       ethAddress
     );
+
     const witness = await circuit.calculateWitness(domainVerifierInputs);
     await circuit.checkConstraints(witness);
     // Calculate DKIM pubkey hash to verify its same as the one from circuit output
     // We input pubkey as 121 * 17 chunk, but the circuit convert it to 242 * 9 chunk for hashing
     // https://zkrepl.dev/?gist=43ce7dce2466c63812f6efec5b13aa73 - This can be used to get pubkey hash from 121 * 17 chunk
 
-    const publicKey = await getPublicKeyForDomainAndSelector(
-      "google.com",
-      "20230601"
+    const dkimResult = await verifyDKIMSignature(
+      rawEmail,
+      "accounts.google.com"
     );
-
-    if (!publicKey) {
-      throw new Error("Public key not found");
-    }
-
-    console.log("publicKey", publicKey?.toString());
-
     const poseidon = await buildPoseidon();
-    const pubkeyChunked = bigIntToChunkedBytes(publicKey, 242, 9);
+    const pubkeyChunked = bigIntToChunkedBytes(dkimResult.publicKey, 242, 9);
+
     const hash = poseidon(pubkeyChunked);
-    console.log("hash", poseidon.F.toObject(hash).toString());
 
     // Assert pubkey hash
     expect(witness[1]).toEqual(poseidon.F.toObject(hash));
@@ -72,10 +66,10 @@ describe("Domain email test", function () {
     expect(witness[3]).toEqual(bytesToBigInt(domainBytes));
 
     // Check address public input
-    expect(witness[4]).toEqual(BigInt(ethAddress));
+    expect(witness[12]).toEqual(BigInt(ethAddress));
   });
 
-  it.skip("should fail if the rewardAmountIndex is invalid", async function () {
+  it("should fail if the rewardAmountIndex is invalid", async function () {
     const domainVerifierInputs = await generateDomainVerifierCircuitInputs(
       rawEmail,
       ethAddress
@@ -94,7 +88,7 @@ describe("Domain email test", function () {
     }
   });
 
-  it.skip("should fail if the rewardAmountIndex is out of bounds", async function () {
+  it("should fail if the rewardAmountIndex is out of bounds", async function () {
     const domainVerifierInputs = await generateDomainVerifierCircuitInputs(
       rawEmail,
       ethAddress

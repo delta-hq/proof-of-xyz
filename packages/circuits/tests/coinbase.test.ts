@@ -46,9 +46,7 @@ describe.skip("Coinbase email test", function () {
     );
     const witness = await circuit.calculateWitness(coinbaseVerifierInputs);
     await circuit.checkConstraints(witness);
-    // Calculate DKIM pubkey hash to verify its same as the one from circuit output
-    // We input pubkey as 121 * 17 chunk, but the circuit convert it to 242 * 9 chunk for hashing
-    // https://zkrepl.dev/?gist=43ce7dce2466c63812f6efec5b13aa73 - This can be used to get pubkey hash from 121 * 17 chunk
+
     const dkimResult = await verifyDKIMSignature(rawEmail, "info.coinbase.com");
     const poseidon = await buildPoseidon();
     const pubkeyChunked = bigIntToChunkedBytes(dkimResult.publicKey, 242, 9);
