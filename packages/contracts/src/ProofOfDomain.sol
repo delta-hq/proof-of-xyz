@@ -13,7 +13,7 @@ contract ProofOfDomain is ERC721Enumerable {
     using NFTSVG for *;
 
     uint16 public constant bytesInPackedBytes = 31;
-    string constant senderDomain = "google.com";
+    string constant senderDomain = "accounts.google.com";
     
     uint32 public constant pubKeyHashIndexInSignals = 0; 
     uint32 public constant toAddrHashIndexInSignals = 1; 
@@ -60,7 +60,7 @@ contract ProofOfDomain is ERC721Enumerable {
     /// Mint a token proving ownership of an email domain by verifying proof of email
     /// @param proof ZK proof of the circuit - a[2], b[4] and c[2] encoded in series
     /// @param signals Public signals of the circuit.
-    function mint(uint256[8] memory proof, uint256[2] memory signals) public {
+    function mint(uint256[8] memory proof, uint256[12] memory signals) public {
         // Verify the DKIM public key hash stored on-chain matches the one used in circuit
         bytes32 dkimPublicKeyHashInCircuit = bytes32(signals[pubKeyHashIndexInSignals]);
 
