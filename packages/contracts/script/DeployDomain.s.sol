@@ -4,8 +4,8 @@ import "forge-std/Test.sol";
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
-import "../src/ProofOfUSDC.sol";
-import "../src/CoinbaseVerifier.sol";
+import "../src/DomainVerifier.sol";
+import "../src/ProofOfDomain.sol";
 
 contract Deploy is Script, Test {
     function getPrivateKey() internal view returns (uint256) {
@@ -22,20 +22,19 @@ contract Deploy is Script, Test {
         address owner = vm.createWallet(sk).addr;
         vm.startBroadcast(sk);
 
-        CoinbaseVerifier proofVerifier = new CoinbaseVerifier();
+        DomainVerifier proofVerifier = new DomainVerifier();
         console.log("Deployed Verifier at address: %s", address(proofVerifier));
 
         DKIMRegistry dkimRegistry = new DKIMRegistry(owner);
         console.log("Deployed DKIMRegistry at address: %s", address(dkimRegistry));
 
-        // info.coinbase.com hash for selector utmvq47cidwb6eo5dijoyabype4gxcbw
         dkimRegistry.setDKIMPublicKeyHash(
-            "info.coinbase.com",
-            0x05289f31a838d16aa64b8bd0519d7de1add46548299208c6cf81914c2bf2ee8b
+            "accounts.google.com",
+            bytes32(uint256(3024598485745563149860456768272954250618223591034926533254923041921841324429))
         );
 
-        ProofOfUSDC testVerifier = new ProofOfUSDC(proofVerifier, dkimRegistry);
-        console.log("Deployed ProofOfUSDC at address: %s", address(testVerifier));
+        ProofOfDomain testVerifier = new ProofOfDomain(proofVerifier, dkimRegistry);
+        console.log("Deployed ProofOfDomain at address: %s", address(testVerifier));
 
         vm.stopBroadcast();
     }
