@@ -45,6 +45,7 @@ def flask_app():
         print("prove_email_auth")
         req = request.get_json()
         input = req["input"]
+        circuit_name = req["circuit_name"]
         logger = logging.getLogger(__name__)
         logger.info(req)
         print(req)
@@ -54,7 +55,7 @@ def flask_app():
         )
         logger.info(nonce)
         print(nonce)
-        proof = gen_email_auth_proof(str(nonce), False, input)
+        proof = gen_email_auth_proof(str(nonce), False, input, circuit_name)
         logger.info(proof)
         print(proof)
         return jsonify(proof)

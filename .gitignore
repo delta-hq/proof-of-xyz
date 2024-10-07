@@ -69,6 +69,8 @@ circuits/regexes/subject_regex*
 
 tsbuildinfo
 
+*.pyc
+
 **/node_modules
 **/build
 **/dist

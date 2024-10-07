@@ -10,8 +10,8 @@ RUN npm install -g n
 RUN n 18
 RUN npm install -g yarn snarkjs
 
-RUN git clone https://github.com/delta-hq/obl-zk-demo.git
-WORKDIR /obl-zk-demo/packages/prover
+RUN git clone https://github.com/delta-hq/proof-of-xyz.git
+WORKDIR /proof-of-xyz/packages/prover
 RUN pip install -r requirements.txt
 RUN cp ./circom_proofgen.sh /root
 WORKDIR /root
@@ -24,8 +24,7 @@ RUN ls /root
 # RUN cp /email-wallet/packages/prover/params/email_sender.wasm /root/params
 RUN mkdir params
 WORKDIR /root/params
-# TODO: change to download params from our AWS bucket
-RUN gdown "https://drive.google.com/uc?id=1Ybtxe1TCVUtHzCPUs9cuZAGbM-MVwigE"
+RUN gdown "https://drive.google.com/uc?export=download&id=14CmP5dtSK-yq848pZo6dVl1A6usqK4R7"
 RUN unzip params.zip
 RUN mv params/* /root/params
 WORKDIR /root

@@ -6,8 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def gen_email_auth_proof(nonce: str, is_local: bool, input: dict) -> dict:
-    circuit_name = "email_auth"
+def gen_email_auth_proof(nonce: str, is_local: bool, input: dict, circuit_name: str) -> dict:
     print("Store input")
     store_input(circuit_name, nonce, input)
     print("Generate proof")
@@ -30,7 +29,7 @@ def store_input(circuit_name: str, nonce: str, json_data: dict):
     )
     logger.info(f"Store user input to {json_file_path}")
     with open(json_file_path, "w") as json_file:
-        json_file.write(json_data)
+        json_file.write(json.dumps(json_data))
 
 
 def load_proof(circuit_name: str, nonce: str) -> dict:
