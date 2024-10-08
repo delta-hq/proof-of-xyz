@@ -18,7 +18,8 @@ image = modal.Image.from_dockerfile("Dockerfile")
     cpu=60,
     secrets=[modal.Secret.from_name("obl-zkdemo")],
     keep_warm=True,
-    volumes={"/root/output": vol}
+    volumes={"/root/output": vol},
+    timeout=20000
 )
 @modal.wsgi_app()
 def flask_app():
