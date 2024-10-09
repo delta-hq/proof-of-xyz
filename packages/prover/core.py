@@ -6,8 +6,7 @@ import logging
 # logger = logging.getLogger(__name__)
 
 
-def gen_email_auth_proof(nonce: str, is_local: bool, input: dict) -> dict:
-    circuit_name = "email_auth_with_body_parsing_with_qp_encoding"
+def gen_email_auth_proof(nonce: str, is_local: bool, input: dict, circuit_name: str) -> dict:
     print("Store input")
     store_input(circuit_name, nonce, input)
     print("Generate proof")
@@ -36,7 +35,7 @@ def store_input(circuit_name: str, nonce: str, json_data: dict):
     print(f"Json data type: {type(json_data)}")
     # logger.info(f"Store user input to {json_file_path}")
     with open(json_file_path, "w") as json_file:
-        json_file.write(json_data)
+        json_file.write(json.dumps(json_data))
     # Read the file back
     with open(json_file_path, "r") as json_file:
         print(json_file.read())
@@ -72,6 +71,9 @@ def gen_proof(circuit_name: str, nonce: str, is_local: bool):
     # logger.info(f"Params dir: {params_dir}")
     build_dir = os.path.join(cur_dir, "build")
     # logger.info(f"Build dir: {build_dir}")
+
+    subprocess.run(["chmod", "+x", os.path.join(cur_dir, "circom_proofgen.sh")])
+
     result = subprocess.run(
         [
             os.path.join(cur_dir, "circom_proofgen.sh"),

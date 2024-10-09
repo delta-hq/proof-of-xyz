@@ -1,11 +1,7 @@
 import modal
 import logging
-from google.cloud.logging import Client
-from google.cloud.logging.handlers import CloudLoggingHandler
-from google.cloud.logging_v2.handlers import setup_logging
-from google.oauth2 import service_account
 
-app = modal.App("email-auth-prover-v1.4.0")
+app = modal.App("obl-zkproverv1.0.1")
 
 image = modal.Image.from_dockerfile("Dockerfile")
 
@@ -14,11 +10,12 @@ image = modal.Image.from_dockerfile("Dockerfile")
     image=image,
     mounts=[
         modal.Mount.from_local_python_packages("core"),
+        modal.Mount.from_local_file("circom_proofgen.sh", remote_path="/root/circom_proofgen.sh"),
     ],
-    cpu=16,
-    gpu="any",
-    secrets=[modal.Secret.from_name("gc-ether-email-auth-prover")],
-    keep_warm=True
+    cpu=60,
+    gpu="H100",
+    secrets=[modal.Secret.from_name("obl-zkdemo")],
+    keep_warm=True,
 )
 @modal.wsgi_app()
 def flask_app():
@@ -32,32 +29,20 @@ def flask_app():
     )
 
     app = Flask(__name__)
-    service_account_info = json.loads(os.environ["SERVICE_ACCOUNT_JSON"])
-    credentials = service_account.Credentials.from_service_account_info(
-        service_account_info
-    )
-    logging_client = Client(project="zkairdrop", credentials=credentials)
-    print(logging_client)
-    handler = CloudLoggingHandler(logging_client, name="ether-email-auth-prover")
-    print(handler)
-    setup_logging(handler)
 
     @app.post("/prove/email_auth")
     def prove_email_auth():
         print("prove_email_auth")
         req = request.get_json()
         input = req["input"]
-        # logger = logging.getLogger(__name__)
-        # logger.info(req)
+        circuit_name = req["circuit_name"]
         print(req)
         nonce = random.randint(
             0,
             sys.maxsize,
         )
-        # logger.info(nonce)
         print(nonce)
-        proof = gen_email_auth_proof(str(nonce), False, input)
-        # logger.info(proof)
+        proof = gen_email_auth_proof(str(nonce), False, input, circuit_name)
         print(proof)
         return jsonify(proof)
 

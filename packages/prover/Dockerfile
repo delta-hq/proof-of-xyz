@@ -36,21 +36,22 @@ RUN npm install -g n
 RUN n 22
 RUN npm install -g yarn snarkjs
 
-RUN git clone https://github.com/zkemail/ether-email-auth.git
-WORKDIR /ether-email-auth/packages/prover
+RUN git clone https://github.com/delta-hq/proof-of-xyz.git
+WORKDIR /proof-of-xyz/packages/prover
 RUN pip install -r requirements.txt
-RUN cp ./circom_proofgen.sh /root
-RUN cp ./email_auth_with_body_parsing_with_qp_encoding /root
+# RUN cp ./circom_proofgen.sh /root
+# RUN cp ./email_auth_with_body_parsing_with_qp_encoding /root
 WORKDIR /root
 RUN ls /root
 RUN mkdir params
 WORKDIR /root/params
-RUN gdown "https://drive.google.com/uc?id=1l3mNqFYv-YZc2efFlphFUkoaCnGCxFtE"
+
+RUN gdown "https://drive.google.com/uc?export=download&id=14CmP5dtSK-yq848pZo6dVl1A6usqK4R7"
 RUN unzip params.zip
 RUN mv params/* /root/params
 WORKDIR /root
 RUN ls params
-RUN chmod +x circom_proofgen.sh
+# RUN chmod +x circom_proofgen.sh
 RUN mkdir build
 
 RUN git clone https://github.com/Orbiter-Finance/rapidsnark.git rapidsnark
